@@ -2,7 +2,7 @@
 # FILE: 202603271530_python_general_setup.py
 # NAME: Dharia, Saumil
 # FIRST CREATED BY CLAUDE ON 202603271630 (March 27, 2026 at 4:30 PM EST)
-# LAST UPDATED BY CLAUDE ON 202605041457 (May 4, 2026 at 2:57 PM EST)
+# LAST UPDATED BY CLAUDE ON 202605041517 (May 4, 2026 at 3:17 PM EST)
 # ================================================================================
 
 """
@@ -221,6 +221,81 @@ try:
             break
 except Exception as e:
     print(f"  ⚠ Oracle setup incomplete: {e}\n")
+
+def test_oracle_connection():
+    """
+    Test and establish Oracle database connection.
+    Reads credentials from .env file in SETUP_DIR (via os.environ['SETUP_DIR']).
+    Requires ORACLE_CLIENT_PATH to be set in os.environ.
+    
+    Returns:
+    --------
+    dict with keys:
+        'connection': oracledb.Connection object
+        'status': 'success' or 'failed'
+        'message': status message
+    """
+    try:
+        # Get SETUP_DIR from environment
+        setup_dir = os.environ.get('SETUP_DIR')
+        if not setup_dir:
+            return {
+                'status': 'failed',
+                'message': 'SETUP_DIR not found in os.environ',
+                'connection': None
+            }
+        
+        # Load .env file from SETUP_DIR
+        env_file_path = os.path.join(setup_dir, '.env')
+        if not os.path.exists(env_file_path):
+            return {
+                'status': 'failed',
+                'message': f'.env file not found at {env_file_path}',
+                'connection': None
+            }
+        
+        load_dotenv(env_file_path)
+        
+        # Get credentials from environment
+        username = os.environ.get('ORACLE_USERNAME')
+        password = os.environ.get('ORACLE_PASSWORD')
+        
+        if not username or not password:
+            return {
+                'status': 'failed',
+                'message': 'ORACLE_USERNAME or ORACLE_PASSWORD not found in .env',
+                'connection': None
+            }
+        
+        # Get ORACLE_CLIENT_PATH from environment
+        oracle_client_path = os.environ.get('ORACLE_CLIENT_PATH')
+        if oracle_client_path and os.path.exists(oracle_client_path):
+            try:
+                oracledb.init_oracle_client(lib_dir=oracle_client_path)
+            except:
+                pass  # Client may already be initialized
+        
+        # Create connection
+        dsn = f"{ORACLE_CONFIG['host']}:{ORACLE_CONFIG['port']}/{ORACLE_CONFIG['service_name']}"
+        connection = oracledb.connect(
+            user=username,
+            password=password,
+            dsn=dsn
+        )
+        
+        print("✓ Successfully connected to Oracle\n")
+        return {
+            'status': 'success',
+            'message': '✓ Successfully connected to Oracle',
+            'connection': connection
+        }
+    
+    except Exception as e:
+        return {
+            'status': 'failed',
+            'message': f'✗ Oracle connection failed: {str(e)[:100]}',
+            'connection': None
+        }
 
 # ========== END SECTION 7 ==========
 
@@ -647,6 +722,7 @@ __all__ = [
     'mask_id_column',
     'add_text_slide',
     'add_image_slide',
+    'test_oracle_connection',
     'ENVIRONMENT', 'GCP_PROJECT_ID', 'ORACLE_CONFIG',
     'os', 'sys', 'glob', 'json', 'csv',
     'file_inventory_cache', 'file_inventory_by_type_cache',
