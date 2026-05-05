@@ -2,7 +2,7 @@
 # FILE: 202603271530_python_general_setup.py
 # NAME: Dharia, Saumil
 # FIRST CREATED BY CLAUDE ON 202603271630 (March 27, 2026 at 4:30 PM EST)
-# LAST UPDATED BY CLAUDE ON 202605041517 (May 4, 2026 at 3:17 PM EST)
+# LAST UPDATED BY CLAUDE ON 202605051605 (May 5, 2026 at 4:05 PM EST)
 # ================================================================================
 
 """
@@ -598,13 +598,31 @@ def get_all_filenames(directory='PROJECT_INPUT'):
 
 # ========== SECTION 11: Utility Functions ==========
 
-def diagnose_dataframe(df, df_name="DataFrame"):
-    """Print comprehensive dataframe diagnostics"""
+def diagnose_dataframe(df, df_name="DataFrame", check_duplicates=True):
+    """Print comprehensive dataframe diagnostics including duplicates"""
     print(f"\n{'='*80}")
     print(f"DATAFRAME DIAGNOSIS: {df_name}")
     print(f"{'='*80}\n")
     print(f"Shape: {df.shape[0]:,} rows × {df.shape[1]} columns")
     print(f"Memory: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB\n")
+    
+    # Duplicate Detection
+    if check_duplicates:
+        duplicate_rows = df.duplicated().sum()
+        print(f"DUPLICATE ANALYSIS:")
+        print(f"  Total duplicate rows: {duplicate_rows:,} ({(duplicate_rows/len(df)*100):.2f}%)")
+        
+        # Check duplicates per column
+        print(f"\n  Duplicates by column:")
+        print(f"  {'Column':<30} {'Unique':<12} {'Duplicates':<12} {'Dup %':<10}")
+        print(f"  {'-'*65}")
+        for col in df.columns:
+            unique_count = df[col].nunique()
+            dup_count = len(df[col]) - unique_count
+            dup_pct = (dup_count / len(df) * 100) if len(df) > 0 else 0
+            print(f"  {col:<30} {unique_count:<12} {dup_count:<12} {dup_pct:.2f}%")
+        print()
+    
     print(f"{'Column':<30} {'Data Type':<15} {'Non-Null':<15} {'Missing':<10}")
     print("-" * 80)
     for col in df.columns:
@@ -658,7 +676,7 @@ def mask_id_column(df, id_column, seed=None, new_id_prefix='ID', length=8):
     return df_masked, id_mapping
 
 print("  ✓ Utility functions ready")
-print("    - diagnose_dataframe()")
+print("    - diagnose_dataframe() [now with duplicate detection]")
 print("    - missing_data_report()")
 print("    - mask_id_column()\n")
 
