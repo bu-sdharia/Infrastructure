@@ -2,7 +2,7 @@
 # FILE: 202603271530_python_general_setup.py
 # NAME: Dharia, Saumil
 # FIRST CREATED BY CLAUDE ON 202603271630 (March 27, 2026 at 4:30 PM EST)
-# LAST UPDATED BY CLAUDE ON 202605051605 (May 5, 2026 at 4:05 PM EST)
+# LAST UPDATED BY CLAUDE ON 202605111703 (May 11, 2026 at 5:03 PM EST)
 # ================================================================================
 
 """
@@ -12,7 +12,29 @@ Centralized configuration for all Python scripts.
 All libraries accessible as: setup.pd, setup.np, setup.plt, etc.
 """
 
-# ========== SECTION 1: Self-Path Setup ==========
+# ================================================================================
+# TABLE OF CONTENTS
+# ================================================================================
+#
+# Section 1:  Self-Path Setup                        (Lines 37-45)
+# Section 2:  Library Detection and Auto-Installation (Lines 51-107)
+# Section 3:  Warning Suppression                     (Lines 109-119)
+# Section 4:  Import All Required Libraries           (Lines 121-172)
+# Section 5:  Environment Detection                   (Lines 174-188)
+# Section 6:  Google Cloud Credentials                (Lines 190-226)
+# Section 7:  Oracle Configuration                    (Lines 228-326)
+# Section 8:  Trino Configuration                     (Lines 328-399)
+# Section 9:  File Lookup Utility                     (Lines 401-411)
+# Section 10: Load and Consolidate Files              (Lines 413-589)
+# Section 11: File Inventory & Retrieval System       (Lines 591-696)
+# Section 12: Utility Functions                       (Lines 698-782)
+# Section 13: PowerPoint Helper Functions             (Lines 784-819)
+# Section 14: Module-Level Exposure                   (Lines 821-850)
+#
+# Line numbers verified after creation via grep.
+# ================================================================================
+
+# ========== SECTION 1: Self-Path Setup (Lines 37-45) ==========
 import os
 import sys
 
@@ -20,13 +42,13 @@ SETUP_PATH = os.path.dirname(os.path.abspath(__file__))
 if SETUP_PATH not in sys.path:
     sys.path.insert(0, SETUP_PATH)
 
-# ========== END SECTION 1 ==========
+# ========== END SECTION 1 (Lines 37-45) ==========
 
 print("=" * 60)
 print("GENERAL SETUP - LIBRARIES & CREDENTIALS")
 print("=" * 60 + "\n")
 
-# ========== SECTION 2: Library Detection and Auto-Installation ==========
+# ========== SECTION 2: Library Detection and Auto-Installation (Lines 51-107) ==========
 
 print("Section 1: Loading Libraries (auto-installing if needed)...\n")
 
@@ -59,6 +81,7 @@ REQUIRED_LIBRARIES = {
     "PIL": "pillow",
     "reportlab": "reportlab",
     "pptx": "python-pptx",
+    "trino": "trino",
 }
 
 def install_library(package_name):
@@ -81,9 +104,9 @@ for import_name, pip_name in REQUIRED_LIBRARIES.items():
 print(f"  ✓ datetime\n")
 print("✓ All libraries loaded and verified\n")
 
-# ========== END SECTION 2 ==========
+# ========== END SECTION 2 (Lines 51-107) ==========
 
-# ========== SECTION 3: Warning Suppression ==========
+# ========== SECTION 3: Warning Suppression (Lines 109-119) ==========
 
 import warnings
 
@@ -93,9 +116,9 @@ warnings.filterwarnings(
     category=UserWarning
 )
 
-# ========== END SECTION 3 ==========
+# ========== END SECTION 3 (Lines 109-119) ==========
 
-# ========== SECTION 4: Import All Required Libraries ==========
+# ========== SECTION 4: Import All Required Libraries (Lines 121-172) ==========
 
 import pandas as pd
 import numpy as np
@@ -104,6 +127,7 @@ import pyarrow as pa
 import scipy
 from scipy import stats
 import statsmodels.api as sm
+import statsmodels.formula.api as smf
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -112,6 +136,8 @@ import pingouin as pg
 
 from sqlalchemy import create_engine
 import oracledb
+from trino.dbapi import connect as trino_connect
+from trino.auth import BasicAuthentication
 from google.cloud import bigquery
 import requests
 from github import Github
@@ -143,9 +169,9 @@ from pptx.dml.color import RGBColor
 
 print("✓ All libraries imported successfully\n")
 
-# ========== END SECTION 4 ==========
+# ========== END SECTION 4 (Lines 121-172) ==========
 
-# ========== SECTION 5: Environment Detection ==========
+# ========== SECTION 5: Environment Detection (Lines 174-188) ==========
 
 print("Section 2: Setting Up Credentials...\n")
 
@@ -159,9 +185,9 @@ def detect_environment():
 ENVIRONMENT = detect_environment()
 print(f"  Detected Environment: {ENVIRONMENT.upper()}\n")
 
-# ========== END SECTION 5 ==========
+# ========== END SECTION 5 (Lines 174-188) ==========
 
-# ========== SECTION 6: Google Cloud Credentials ==========
+# ========== SECTION 6: Google Cloud Credentials (Lines 190-226) ==========
 
 if ENVIRONMENT == 'cloud':
     print("  ✓ Google Cloud environment detected\n")
@@ -197,9 +223,9 @@ elif ENVIRONMENT == 'windows':
 else:
     GCP_PROJECT_ID = None
 
-# ========== END SECTION 6 ==========
+# ========== END SECTION 6 (Lines 190-226) ==========
 
-# ========== SECTION 7: Oracle Configuration ==========
+# ========== SECTION 7: Oracle Configuration (Lines 228-326) ==========
 
 ORACLE_CONFIG = {
     'host': '10.63.133.38',
@@ -297,9 +323,82 @@ def test_oracle_connection():
             'connection': None
         }
 
-# ========== END SECTION 7 ==========
+# ========== END SECTION 7 (Lines 228-326) ==========
 
-# ========== SECTION 8: File Lookup Utility ==========
+# ========== SECTION 8: Trino Configuration (Lines 328-399) ==========
+
+TRINO_CONFIG = {
+    'host': 'trino.de-eks-nonprod.bu.edu',
+    'port': 443,
+    'http_scheme': 'https',
+}
+
+def trino_connection():
+    """
+    Test and establish Trino data lake connection.
+    Reads TRINO_USERNAME and TRINO_PASSWORD from .env file in SETUP_DIR.
+    
+    Returns:
+    --------
+    dict with keys:
+        'connection': trino.dbapi.Connection object
+        'status': 'success' or 'failed'
+        'message': status message
+    """
+    try:
+        setup_dir = os.environ.get('SETUP_DIR')
+        if not setup_dir:
+            return {
+                'status': 'failed',
+                'message': 'SETUP_DIR not found in os.environ',
+                'connection': None
+            }
+        
+        env_file_path = os.path.join(setup_dir, '.env')
+        if not os.path.exists(env_file_path):
+            return {
+                'status': 'failed',
+                'message': f'.env file not found at {env_file_path}',
+                'connection': None
+            }
+        
+        load_dotenv(env_file_path)
+        
+        username = os.environ.get('TRINO_USERNAME')
+        password = os.environ.get('TRINO_PASSWORD')
+        
+        if not username or not password:
+            return {
+                'status': 'failed',
+                'message': 'TRINO_USERNAME or TRINO_PASSWORD not found in .env',
+                'connection': None
+            }
+        
+        connection = trino_connect(
+            host=TRINO_CONFIG['host'],
+            port=TRINO_CONFIG['port'],
+            http_scheme=TRINO_CONFIG['http_scheme'],
+            user=username,
+            auth=BasicAuthentication(username, password),
+        )
+        
+        print("✓ Successfully connected to Trino\n")
+        return {
+            'status': 'success',
+            'message': '✓ Successfully connected to Trino',
+            'connection': connection
+        }
+    
+    except Exception as e:
+        return {
+            'status': 'failed',
+            'message': f'✗ Trino connection failed: {str(e)[:100]}',
+            'connection': None
+        }
+
+# ========== END SECTION 8 (Lines 328-399) ==========
+
+# ========== SECTION 9: File Lookup Utility (Lines 401-411) ==========
 
 def find_file_by_timestamp_prefix(timestamp_prefix, search_dir=None, file_pattern=None):
     """Find a file by its YYYYMMDDHHMM timestamp prefix"""
@@ -309,9 +408,9 @@ def find_file_by_timestamp_prefix(timestamp_prefix, search_dir=None, file_patter
     matches = glob.glob(os.path.join(search_dir, pattern))
     return matches[0] if matches else None
 
-# ========== END SECTION 8 ==========
+# ========== END SECTION 9 (Lines 401-411) ==========
 
-# ========== SECTION 9: Load and Consolidate Files ==========
+# ========== SECTION 10: Load and Consolidate Files (Lines 413-589) ==========
 
 def load_consolidate_files(file_list, input_path, auto_skip_rows=True, verbose=True):
     """
@@ -487,9 +586,9 @@ def load_consolidate_files(file_list, input_path, auto_skip_rows=True, verbose=T
             print(f"\n✗ WARNING: No files loaded successfully")
         return pd.DataFrame()
 
-# ========== END SECTION 9 ==========
+# ========== END SECTION 10 (Lines 413-589) ==========
 
-# ========== SECTION 10: File Inventory & Retrieval System ==========
+# ========== SECTION 11: File Inventory & Retrieval System (Lines 591-696) ==========
 
 # Global file inventory caches
 file_inventory_cache = {}
@@ -594,9 +693,9 @@ def get_all_filenames(directory='PROJECT_INPUT'):
     
     return []
 
-# ========== END SECTION 10 ==========
+# ========== END SECTION 11 (Lines 591-696) ==========
 
-# ========== SECTION 11: Utility Functions ==========
+# ========== SECTION 12: Utility Functions (Lines 698-782) ==========
 
 def diagnose_dataframe(df, df_name="DataFrame", check_duplicates=True):
     """Print comprehensive dataframe diagnostics including duplicates"""
@@ -680,9 +779,9 @@ print("    - diagnose_dataframe() [now with duplicate detection]")
 print("    - missing_data_report()")
 print("    - mask_id_column()\n")
 
-# ========== END SECTION 11 ==========
+# ========== END SECTION 12 (Lines 698-782) ==========
 
-# ========== SECTION 12: PowerPoint Helper Functions ==========
+# ========== SECTION 13: PowerPoint Helper Functions (Lines 784-819) ==========
 
 def add_text_slide(prs, title, paragraph_text):
     """Add a text-only slide to PowerPoint"""
@@ -717,14 +816,15 @@ print("  ✓ PowerPoint helper functions ready:")
 print("    - add_text_slide()")
 print("    - add_image_slide()\n")
 
-# ========== END SECTION 12 ==========
+# ========== END SECTION 13 (Lines 784-819) ==========
 
-# ========== SECTION 13: Module-Level Exposure ==========
+# ========== SECTION 14: Module-Level Exposure (Lines 821-850) ==========
 
 __all__ = [
     'pd', 'np', 'pa',
-    'scipy', 'stats', 'sm', 'pg',
+    'scipy', 'stats', 'sm', 'smf', 'pg',
     'create_engine', 'oracledb', 'bigquery',
+    'trino_connect', 'BasicAuthentication',
     'plt', 'sns', 'px', 'go',
     'tqdm', 'Image', 'BeautifulSoup',
     'Presentation', 'Inches', 'Pt', 'PP_ALIGN', 'RGBColor',
@@ -741,12 +841,13 @@ __all__ = [
     'add_text_slide',
     'add_image_slide',
     'test_oracle_connection',
-    'ENVIRONMENT', 'GCP_PROJECT_ID', 'ORACLE_CONFIG',
+    'trino_connection',
+    'ENVIRONMENT', 'GCP_PROJECT_ID', 'ORACLE_CONFIG', 'TRINO_CONFIG',
     'os', 'sys', 'glob', 'json', 'csv',
     'file_inventory_cache', 'file_inventory_by_type_cache',
 ]
 
-# ========== END SECTION 13 ==========
+# ========== END SECTION 14 (Lines 821-850) ==========
 
 print("=" * 60)
 print("GENERAL SETUP COMPLETE")
