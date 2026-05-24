@@ -16,20 +16,21 @@ All libraries accessible as: setup.pd, setup.np, setup.plt, etc.
 # TABLE OF CONTENTS
 # ================================================================================
 #
-# Section 1:  Self-Path Setup                        (Lines 37-45)
-# Section 2:  Library Detection and Auto-Installation (Lines 51-107)
-# Section 3:  Warning Suppression                     (Lines 109-119)
-# Section 4:  Import All Required Libraries           (Lines 121-172)
-# Section 5:  Environment Detection                   (Lines 174-188)
-# Section 6:  Google Cloud Credentials                (Lines 190-226)
-# Section 7:  Oracle Configuration                    (Lines 228-326)
-# Section 8:  Trino Configuration                     (Lines 328-399)
-# Section 9:  File Lookup Utility                     (Lines 401-411)
-# Section 10: Load and Consolidate Files              (Lines 413-589)
-# Section 11: File Inventory & Retrieval System       (Lines 591-696)
-# Section 12: Utility Functions                       (Lines 698-782)
-# Section 13: PowerPoint Helper Functions             (Lines 784-819)
-# Section 14: Module-Level Exposure                   (Lines 821-850)
+# Section 1:  Self-Path Setup                         (Lines 38-46)
+# Section 2:  Library Detection and Auto-Installation  (Lines 52-108)
+# Section 3:  Warning Suppression                      (Lines 110-120)
+# Section 4:  Import All Required Libraries            (Lines 122-175)
+# Section 5:  Environment Detection                    (Lines 177-191)
+# Section 6:  Google Cloud Credentials                 (Lines 193-229)
+# Section 7:  Oracle Configuration                     (Lines 231-329)
+# Section 8:  Trino Configuration                      (Lines 331-402)
+# Section 9:  File Lookup Utility                      (Lines 404-414)
+# Section 10: Load and Consolidate Files               (Lines 416-592)
+# Section 11: File Inventory & Retrieval System        (Lines 594-699)
+# Section 12: Utility Functions                        (Lines 701-794)
+# Section 13: PowerPoint Helper Functions              (Lines 796-831)
+# Section 14: PDF Helper Functions                     (Lines 833-896)
+# Section 15: Module-Level Exposure                    (Lines 898-934)
 #
 # Line numbers verified after creation via grep.
 # ================================================================================
@@ -159,9 +160,12 @@ from dotenv import load_dotenv
 from PIL import Image
 
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage, PageBreak, Table, TableStyle
+from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
@@ -695,15 +699,24 @@ def get_all_filenames(directory='PROJECT_INPUT'):
 
 # ========== END SECTION 11 (Lines 591-696) ==========
 
-# ========== SECTION 12: Utility Functions (Lines 698-782) ==========
+# ========== SECTION 12: Utility Functions (Lines 698-791) ==========
 
-def diagnose_dataframe(df, df_name="DataFrame", check_duplicates=True):
+def diagnose_dataframe(df, df_name="DataFrame", check_duplicates=True, preview_rows=5):
     """Print comprehensive dataframe diagnostics including duplicates"""
     print(f"\n{'='*80}")
     print(f"DATAFRAME DIAGNOSIS: {df_name}")
     print(f"{'='*80}\n")
     print(f"Shape: {df.shape[0]:,} rows × {df.shape[1]} columns")
     print(f"Memory: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB\n")
+    
+    # Data Preview (all columns in one wide row, no block wrapping)
+    print(f"DATA PREVIEW (first {preview_rows} rows, all columns):")
+    print("-" * 80)
+    with pd.option_context('display.max_columns', None,
+                           'display.width', None,
+                           'display.max_colwidth', 30):
+        print(df.head(preview_rows).to_string())
+    print()
     
     # Duplicate Detection
     if check_duplicates:
@@ -775,11 +788,11 @@ def mask_id_column(df, id_column, seed=None, new_id_prefix='ID', length=8):
     return df_masked, id_mapping
 
 print("  ✓ Utility functions ready")
-print("    - diagnose_dataframe() [now with duplicate detection]")
+print("    - diagnose_dataframe() [now with 5-row preview + duplicate detection]")
 print("    - missing_data_report()")
 print("    - mask_id_column()\n")
 
-# ========== END SECTION 12 (Lines 698-782) ==========
+# ========== END SECTION 12 (Lines 698-791) ==========
 
 # ========== SECTION 13: PowerPoint Helper Functions (Lines 784-819) ==========
 
@@ -818,7 +831,112 @@ print("    - add_image_slide()\n")
 
 # ========== END SECTION 13 (Lines 784-819) ==========
 
-# ========== SECTION 14: Module-Level Exposure (Lines 821-850) ==========
+# ========== SECTION 14: PDF Helper Functions (Lines 833-896) ==========
+
+def add_chapter_header(story, college_code, college_name):
+    """Add chapter divider page with college name. Registers a TOC entry at level 0."""
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'ChapterTitle',
+        parent=styles['Heading1'],
+        fontSize=28,
+        textColor=colors.HexColor('#4472C4'),
+        spaceAfter=30,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+
+    class TOCParagraph(Paragraph):
+        """Paragraph subclass that emits a TOCEntry notification when drawn."""
+        def draw(self):
+            Paragraph.draw(self)
+            key = f'chapter_{college_code}'
+            self.canv.bookmarkPage(key)
+            self.canv._doctemplate.notify('TOCEntry', (0, college_name, self.canv.getPageNumber(), key))
+
+    story.append(Spacer(1, 1.5*inch))
+    story.append(TOCParagraph(college_name, title_style))
+    story.append(Spacer(1, 1.5*inch))
+    story.append(PageBreak())
+    return story
+
+def add_image_with_caption(story, image_path):
+    """Add image to story (image already has title in PNG). Uses RLImage (reportlab) to avoid clashing with PIL.Image."""
+    if os.path.exists(image_path):
+        try:
+            img = RLImage(image_path, width=6.5*inch, height=6.5*inch*0.65)
+            story.append(img)
+            story.append(Spacer(1, 0.3*inch))
+        except Exception as e:
+            print(f'Error loading image {image_path}: {e}')
+    else:
+        print(f'Image not found: {image_path}')
+    return story
+
+def add_insights_bullets(story, insights, heading='Key Insights'):
+    """Add insights as bullet points."""
+    styles = getSampleStyleSheet()
+    heading_style = ParagraphStyle(
+        'InsightHeading',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#4472C4'),
+        spaceAfter=12,
+        fontName='Helvetica-Bold'
+    )
+    bullet_style = ParagraphStyle(
+        'BulletText',
+        parent=styles['Normal'],
+        fontSize=10,
+        leftIndent=0.3*inch,
+        spaceAfter=10,
+        alignment=TA_JUSTIFY
+    )
+    story.append(Paragraph(heading, heading_style))
+    for insight in insights:
+        story.append(Paragraph(f'• {insight}', bullet_style))
+    story.append(Spacer(1, 0.3*inch))
+    return story
+
+def build_table_of_contents(story, heading='Table of Contents'):
+    """Insert a dynamic TOC that auto-fills via doc.multiBuild(). Requires chapters added via add_chapter_header."""
+    styles = getSampleStyleSheet()
+    heading_style = ParagraphStyle(
+        'TOCHeading',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor=colors.HexColor('#4472C4'),
+        spaceAfter=24,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    toc_entry_style = ParagraphStyle(
+        'TOCEntry0',
+        parent=styles['Normal'],
+        fontSize=12,
+        leftIndent=0.3*inch,
+        spaceAfter=8,
+        fontName='Helvetica'
+    )
+
+    toc = TableOfContents()
+    toc.levelStyles = [toc_entry_style]
+
+    story.append(Spacer(1, 0.5*inch))
+    story.append(Paragraph(heading, heading_style))
+    story.append(Spacer(1, 0.3*inch))
+    story.append(toc)
+    story.append(PageBreak())
+    return story
+
+print("  ✓ PDF helper functions ready:")
+print("    - add_chapter_header()")
+print("    - add_image_with_caption()")
+print("    - add_insights_bullets()\n")
+
+# ========== END SECTION 14 (Lines 833-896) ==========
+
+# ========== SECTION 15: Module-Level Exposure (Lines 898-934) ==========
 
 __all__ = [
     'pd', 'np', 'pa',
@@ -840,14 +958,22 @@ __all__ = [
     'mask_id_column',
     'add_text_slide',
     'add_image_slide',
+    'add_chapter_header',
+    'add_image_with_caption',
+    'add_insights_bullets',
+    'RLImage', 'Table', 'TableStyle', 'colors',
+    'TA_CENTER', 'TA_LEFT', 'TA_JUSTIFY',
+    'SimpleDocTemplate', 'Paragraph', 'Spacer', 'PageBreak',
+    'getSampleStyleSheet', 'ParagraphStyle', 'inch', 'letter',
     'test_oracle_connection',
     'trino_connection',
     'ENVIRONMENT', 'GCP_PROJECT_ID', 'ORACLE_CONFIG', 'TRINO_CONFIG',
     'os', 'sys', 'glob', 'json', 'csv',
     'file_inventory_cache', 'file_inventory_by_type_cache',
+    'build_table_of_contents',
 ]
 
-# ========== END SECTION 14 (Lines 821-850) ==========
+# ========== END SECTION 15 (Lines 898-934) ==========
 
 print("=" * 60)
 print("GENERAL SETUP COMPLETE")
