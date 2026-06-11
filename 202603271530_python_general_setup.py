@@ -335,6 +335,8 @@ TRINO_CONFIG = {
     'host': 'trino.de-eks-nonprod.bu.edu',
     'port': 443,
     'http_scheme': 'https',
+    'catalog': 'iceberg',
+    'schema': 'pond_asir',
 }
 
 def trino_connection():
@@ -384,6 +386,8 @@ def trino_connection():
             http_scheme=TRINO_CONFIG['http_scheme'],
             user=username,
             auth=BasicAuthentication(username, password),
+            catalog=TRINO_CONFIG['catalog'],
+            schema=TRINO_CONFIG['schema'],
         )
         
         print("✓ Successfully connected to Trino\n")
@@ -935,6 +939,60 @@ print("    - add_image_with_caption()")
 print("    - add_insights_bullets()\n")
 
 # ========== END SECTION 14 (Lines 833-896) ==========
+
+# ========== SECTION 14B: PDF Prose Helpers (themed chapters) ==========
+
+def add_section_header(story, text):
+    """Bold blue section label, e.g. 'Observations' / 'What does this mean?'."""
+    styles = getSampleStyleSheet()
+    section_style = ParagraphStyle(
+        'SectionHeader',
+        parent=styles['Heading1'],
+        fontSize=16,
+        textColor=colors.HexColor('#4472C4'),
+        spaceBefore=6,
+        spaceAfter=14,
+        fontName='Helvetica-Bold'
+    )
+    story.append(Paragraph(text, section_style))
+    return story
+
+def add_subheading(story, text):
+    """Bold theme subheading, e.g. 'Net Tuition Revenue' / 'Enrollment'."""
+    styles = getSampleStyleSheet()
+    sub_style = ParagraphStyle(
+        'SubHeading',
+        parent=styles['Heading2'],
+        fontSize=13,
+        textColor=colors.HexColor('#2F2F2F'),
+        spaceBefore=8,
+        spaceAfter=6,
+        fontName='Helvetica-Bold'
+    )
+    story.append(Paragraph(text, sub_style))
+    return story
+
+def add_paragraph(story, text):
+    """Flowing justified prose paragraph (no bullet)."""
+    styles = getSampleStyleSheet()
+    prose_style = ParagraphStyle(
+        'BodyProse',
+        parent=styles['Normal'],
+        fontSize=10,
+        spaceAfter=10,
+        leading=14,
+        alignment=TA_JUSTIFY
+    )
+    story.append(Paragraph(text, prose_style))
+    story.append(Spacer(1, 0.05*inch))
+    return story
+
+print("  ✓ PDF prose helpers ready:")
+print("    - add_section_header()")
+print("    - add_subheading()")
+print("    - add_paragraph()\n")
+
+# ========== END SECTION 14B ==========
 
 # ========== SECTION 15: Module-Level Exposure (Lines 898-934) ==========
 
