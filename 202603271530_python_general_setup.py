@@ -2,7 +2,7 @@
 # FILE: 202603271530_python_general_setup.py
 # NAME: Dharia, Saumil
 # FIRST CREATED BY CLAUDE ON 202603271630 (March 27, 2026 at 4:30 PM EST)
-# LAST UPDATED BY CLAUDE ON 202605111703 (May 11, 2026 at 5:03 PM EST)
+# LAST UPDATED BY CLAUDE ON 202607011048 (July 01, 2026 at 10:48 AM EST)
 # ================================================================================
 
 """
@@ -16,26 +16,28 @@ All libraries accessible as: setup.pd, setup.np, setup.plt, etc.
 # TABLE OF CONTENTS
 # ================================================================================
 #
-# Section 1:  Self-Path Setup                         (Lines 38-46)
-# Section 2:  Library Detection and Auto-Installation  (Lines 52-108)
-# Section 3:  Warning Suppression                      (Lines 110-120)
-# Section 4:  Import All Required Libraries            (Lines 122-175)
-# Section 5:  Environment Detection                    (Lines 177-191)
-# Section 6:  Google Cloud Credentials                 (Lines 193-229)
-# Section 7:  Oracle Configuration                     (Lines 231-329)
-# Section 8:  Trino Configuration                      (Lines 331-402)
-# Section 9:  File Lookup Utility                      (Lines 404-414)
-# Section 10: Load and Consolidate Files               (Lines 416-592)
-# Section 11: File Inventory & Retrieval System        (Lines 594-699)
-# Section 12: Utility Functions                        (Lines 701-794)
-# Section 13: PowerPoint Helper Functions              (Lines 796-831)
-# Section 14: PDF Helper Functions                     (Lines 833-896)
-# Section 15: Module-Level Exposure                    (Lines 898-934)
+# Section 1:  Self-Path Setup                         (Lines 40-48)
+# Section 2:  Library Detection and Auto-Installation  (Lines 54-110)
+# Section 3:  Warning Suppression                      (Lines 112-122)
+# Section 4:  Import All Required Libraries            (Lines 124-178)
+# Section 5:  Environment Detection                    (Lines 180-194)
+# Section 6:  Google Cloud Credentials                 (Lines 196-232)
+# Section 7:  Oracle Configuration                     (Lines 234-332)
+# Section 8:  Trino Configuration                      (Lines 334-409)
+# Section 9:  File Lookup Utility                      (Lines 411-421)
+# Section 10: Load and Consolidate Files               (Lines 423-599)
+# Section 11: File Inventory & Retrieval System        (Lines 601-706)
+# Section 12: Utility Functions                        (Lines 708-801)
+# Section 13: PowerPoint Helper Functions              (Lines 803-838)
+# Section 14: PDF Helper Functions                     (Lines 840-943)
+# Section 14B: PDF Prose Helpers                       (Lines 945-997)
+# Section 14C: Standardized Table PNG Renderer         (Lines 999-1069)
+# Section 15: Module-Level Exposure                    (Lines 1071-1109)
 #
 # Line numbers verified after creation via grep.
 # ================================================================================
 
-# ========== SECTION 1: Self-Path Setup (Lines 37-45) ==========
+# ========== SECTION 1: Self-Path Setup (Lines 40-48) ==========
 import os
 import sys
 
@@ -43,13 +45,13 @@ SETUP_PATH = os.path.dirname(os.path.abspath(__file__))
 if SETUP_PATH not in sys.path:
     sys.path.insert(0, SETUP_PATH)
 
-# ========== END SECTION 1 (Lines 37-45) ==========
+# ========== END SECTION 1 (Lines 40-48) ==========
 
 print("=" * 60)
 print("GENERAL SETUP - LIBRARIES & CREDENTIALS")
 print("=" * 60 + "\n")
 
-# ========== SECTION 2: Library Detection and Auto-Installation (Lines 51-107) ==========
+# ========== SECTION 2: Library Detection and Auto-Installation (Lines 54-110) ==========
 
 print("Section 1: Loading Libraries (auto-installing if needed)...\n")
 
@@ -105,9 +107,9 @@ for import_name, pip_name in REQUIRED_LIBRARIES.items():
 print(f"  ✓ datetime\n")
 print("✓ All libraries loaded and verified\n")
 
-# ========== END SECTION 2 (Lines 51-107) ==========
+# ========== END SECTION 2 (Lines 54-110) ==========
 
-# ========== SECTION 3: Warning Suppression (Lines 109-119) ==========
+# ========== SECTION 3: Warning Suppression (Lines 112-122) ==========
 
 import warnings
 
@@ -117,9 +119,9 @@ warnings.filterwarnings(
     category=UserWarning
 )
 
-# ========== END SECTION 3 (Lines 109-119) ==========
+# ========== END SECTION 3 (Lines 112-122) ==========
 
-# ========== SECTION 4: Import All Required Libraries (Lines 121-172) ==========
+# ========== SECTION 4: Import All Required Libraries (Lines 124-178) ==========
 
 import pandas as pd
 import numpy as np
@@ -173,9 +175,9 @@ from pptx.dml.color import RGBColor
 
 print("✓ All libraries imported successfully\n")
 
-# ========== END SECTION 4 (Lines 121-172) ==========
+# ========== END SECTION 4 (Lines 124-178) ==========
 
-# ========== SECTION 5: Environment Detection (Lines 174-188) ==========
+# ========== SECTION 5: Environment Detection (Lines 180-194) ==========
 
 print("Section 2: Setting Up Credentials...\n")
 
@@ -189,9 +191,9 @@ def detect_environment():
 ENVIRONMENT = detect_environment()
 print(f"  Detected Environment: {ENVIRONMENT.upper()}\n")
 
-# ========== END SECTION 5 (Lines 174-188) ==========
+# ========== END SECTION 5 (Lines 180-194) ==========
 
-# ========== SECTION 6: Google Cloud Credentials (Lines 190-226) ==========
+# ========== SECTION 6: Google Cloud Credentials (Lines 196-232) ==========
 
 if ENVIRONMENT == 'cloud':
     print("  ✓ Google Cloud environment detected\n")
@@ -227,9 +229,9 @@ elif ENVIRONMENT == 'windows':
 else:
     GCP_PROJECT_ID = None
 
-# ========== END SECTION 6 (Lines 190-226) ==========
+# ========== END SECTION 6 (Lines 196-232) ==========
 
-# ========== SECTION 7: Oracle Configuration (Lines 228-326) ==========
+# ========== SECTION 7: Oracle Configuration (Lines 234-332) ==========
 
 ORACLE_CONFIG = {
     'host': '10.63.133.38',
@@ -327,9 +329,9 @@ def test_oracle_connection():
             'connection': None
         }
 
-# ========== END SECTION 7 (Lines 228-326) ==========
+# ========== END SECTION 7 (Lines 234-332) ==========
 
-# ========== SECTION 8: Trino Configuration (Lines 328-399) ==========
+# ========== SECTION 8: Trino Configuration (Lines 334-409) ==========
 
 TRINO_CONFIG = {
     'host': 'trino.de-eks-nonprod.bu.edu',
@@ -404,9 +406,9 @@ def trino_connection():
             'connection': None
         }
 
-# ========== END SECTION 8 (Lines 328-399) ==========
+# ========== END SECTION 8 (Lines 334-409) ==========
 
-# ========== SECTION 9: File Lookup Utility (Lines 401-411) ==========
+# ========== SECTION 9: File Lookup Utility (Lines 411-421) ==========
 
 def find_file_by_timestamp_prefix(timestamp_prefix, search_dir=None, file_pattern=None):
     """Find a file by its YYYYMMDDHHMM timestamp prefix"""
@@ -416,9 +418,9 @@ def find_file_by_timestamp_prefix(timestamp_prefix, search_dir=None, file_patter
     matches = glob.glob(os.path.join(search_dir, pattern))
     return matches[0] if matches else None
 
-# ========== END SECTION 9 (Lines 401-411) ==========
+# ========== END SECTION 9 (Lines 411-421) ==========
 
-# ========== SECTION 10: Load and Consolidate Files (Lines 413-589) ==========
+# ========== SECTION 10: Load and Consolidate Files (Lines 423-599) ==========
 
 def load_consolidate_files(file_list, input_path, auto_skip_rows=True, verbose=True):
     """
@@ -594,9 +596,9 @@ def load_consolidate_files(file_list, input_path, auto_skip_rows=True, verbose=T
             print(f"\n✗ WARNING: No files loaded successfully")
         return pd.DataFrame()
 
-# ========== END SECTION 10 (Lines 413-589) ==========
+# ========== END SECTION 10 (Lines 423-599) ==========
 
-# ========== SECTION 11: File Inventory & Retrieval System (Lines 591-696) ==========
+# ========== SECTION 11: File Inventory & Retrieval System (Lines 601-706) ==========
 
 # Global file inventory caches
 file_inventory_cache = {}
@@ -701,9 +703,9 @@ def get_all_filenames(directory='PROJECT_INPUT'):
     
     return []
 
-# ========== END SECTION 11 (Lines 591-696) ==========
+# ========== END SECTION 11 (Lines 601-706) ==========
 
-# ========== SECTION 12: Utility Functions (Lines 698-791) ==========
+# ========== SECTION 12: Utility Functions (Lines 708-801) ==========
 
 def diagnose_dataframe(df, df_name="DataFrame", check_duplicates=True, preview_rows=5):
     """Print comprehensive dataframe diagnostics including duplicates"""
@@ -796,9 +798,9 @@ print("    - diagnose_dataframe() [now with 5-row preview + duplicate detection]
 print("    - missing_data_report()")
 print("    - mask_id_column()\n")
 
-# ========== END SECTION 12 (Lines 698-791) ==========
+# ========== END SECTION 12 (Lines 708-801) ==========
 
-# ========== SECTION 13: PowerPoint Helper Functions (Lines 784-819) ==========
+# ========== SECTION 13: PowerPoint Helper Functions (Lines 803-838) ==========
 
 def add_text_slide(prs, title, paragraph_text):
     """Add a text-only slide to PowerPoint"""
@@ -833,9 +835,9 @@ print("  ✓ PowerPoint helper functions ready:")
 print("    - add_text_slide()")
 print("    - add_image_slide()\n")
 
-# ========== END SECTION 13 (Lines 784-819) ==========
+# ========== END SECTION 13 (Lines 803-838) ==========
 
-# ========== SECTION 14: PDF Helper Functions (Lines 833-896) ==========
+# ========== SECTION 14: PDF Helper Functions (Lines 840-943) ==========
 
 def add_chapter_header(story, college_code, college_name):
     """Add chapter divider page with college name. Registers a TOC entry at level 0."""
@@ -938,7 +940,7 @@ print("    - add_chapter_header()")
 print("    - add_image_with_caption()")
 print("    - add_insights_bullets()\n")
 
-# ========== END SECTION 14 (Lines 833-896) ==========
+# ========== END SECTION 14 (Lines 840-943) ==========
 
 # ========== SECTION 14B: PDF Prose Helpers (themed chapters) ==========
 
@@ -992,9 +994,81 @@ print("    - add_section_header()")
 print("    - add_subheading()")
 print("    - add_paragraph()\n")
 
-# ========== END SECTION 14B ==========
+# ========== END SECTION 14B (Lines 945-997) ==========
 
-# ========== SECTION 15: Module-Level Exposure (Lines 898-934) ==========
+# ========== SECTION 14C: Standardized Table PNG Renderer (Lines 999-1069) ==========
+
+def render_table_png(df, col_labels, title_str, filename, output_dir, fmt='headcount'):
+    """
+    Render a styled table PNG (blue #4472C4 header, banded gray/white rows) and save it.
+    This is the single house standard for every table graphic across projects —
+    call this instead of writing a local one-off table-rendering function.
+
+    df:         DataFrame whose index becomes the leftmost row-label column.
+    col_labels: list of column headers — first entry is the row-label column
+                (e.g. ['AY', 'QST', 'SPH', ...] or ['STATUS', 'COUNT']).
+    title_str:  Title printed above the table.
+    filename:   PNG filename (e.g. 'enrollment_by_program_and_year_table.png').
+    output_dir: Directory to save into (e.g. PROJECT_OUTPUT or PROJECT_REVIEW).
+    fmt:        'headcount' -> '{:,.0f}'
+                'currency'  -> '${:,.0f}'
+                'text'      -> values printed as-is (mixed types, already-formatted strings, '-')
+
+    Usage:
+    ------
+    setup.render_table_png(
+        STATUS_SUMMARY_DF.set_index('STATUS'),
+        col_labels=['STATUS', 'COUNT'],
+        title_str='BU Drop-Out Population - NSC Enrollment Status',
+        filename='enrollment_status_summary_table.png',
+        output_dir=PROJECT_OUTPUT,
+        fmt='headcount'
+    )
+    """
+    n_cols = len(col_labels)
+    fig_width = max(14, n_cols * 1.3)
+    fig, ax = plt.subplots(figsize=(fig_width, 7))
+    ax.axis('tight'); ax.axis('off')
+
+    if fmt == 'currency':
+        table_data = [[str(idx)] + ['${:,.0f}'.format(v) for v in df.loc[idx].values] for idx in df.index]
+    elif fmt == 'headcount':
+        table_data = [[str(idx)] + ['{:,.0f}'.format(v) for v in df.loc[idx].values] for idx in df.index]
+    else:  # 'text' - leave values as-is
+        table_data = [[str(idx)] + [str(v) for v in df.loc[idx].values] for idx in df.index]
+
+    col_width = 0.95 / n_cols
+    table = ax.table(cellText=table_data, colLabels=col_labels,
+                      cellLoc='center', loc='center',
+                      colWidths=[col_width] * n_cols)
+    table.auto_set_font_size(False); table.set_fontsize(9); table.scale(1, 2.5)
+
+    for i in range(n_cols):
+        cell = table[(0, i)]
+        cell.set_facecolor('#4472C4')
+        cell.set_text_props(weight='bold', color='white', size=10)
+
+    for i in range(len(df.index)):
+        for j in range(n_cols):
+            cell = table[(i + 1, j)]
+            cell.set_facecolor('#F0F0F0' if i % 2 == 0 else 'white')
+
+    plt.title(title_str, fontsize=14, fontweight='bold', pad=30)
+    plt.subplots_adjust(top=0.85)
+
+    output_path = os.path.join(output_dir, filename)
+    plt.savefig(output_path, dpi=150, bbox_inches='tight', pad_inches=0.5, facecolor='white')
+    plt.show()
+    plt.close()
+    print(f'\u2713 {output_path}')
+    return output_path
+
+print("  \u2713 Table renderer ready:")
+print("    - render_table_png()  [house style: #4472C4 header, banded gray/white rows]\n")
+
+# ========== END SECTION 14C (Lines 999-1069) ==========
+
+# ========== SECTION 15: Module-Level Exposure (Lines 1071-1109) ==========
 
 __all__ = [
     'pd', 'np', 'pa',
@@ -1019,6 +1093,7 @@ __all__ = [
     'add_chapter_header',
     'add_image_with_caption',
     'add_insights_bullets',
+    'render_table_png',
     'RLImage', 'Table', 'TableStyle', 'colors',
     'TA_CENTER', 'TA_LEFT', 'TA_JUSTIFY',
     'SimpleDocTemplate', 'Paragraph', 'Spacer', 'PageBreak',
@@ -1031,7 +1106,7 @@ __all__ = [
     'build_table_of_contents',
 ]
 
-# ========== END SECTION 15 (Lines 898-934) ==========
+# ========== END SECTION 15 (Lines 1071-1109) ==========
 
 print("=" * 60)
 print("GENERAL SETUP COMPLETE")
